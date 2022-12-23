@@ -72,17 +72,19 @@ describe("Todo Application", function () {
   });
 
   test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
-         const res = await agent.get("/todos");
-         const parsedResponse = JSON.parse(res.text);
-         const todoID = parsedResponse[0].id;
-         const len = parsedResponse.length;
+    const res = await agent.get("/todos");
+    const parsedResponse = JSON.parse(res.text);
+    const todoID = parsedResponse[0].id;
+    const len = parsedResponse.length;
 
-         const delStatus = JSON.parse((await agent.delete(`/todos/${todoID}`).send()).text);
+    const delStatus = JSON.parse(
+      (await agent.delete(`/todos/${todoID}`).send()).text
+    );
 
-         const newResponse = await agent.get("/todos");
-         const newParsedResponse = JSON.parse(newResponse.text);
+    const newResponse = await agent.get("/todos");
+    const newParsedResponse = JSON.parse(newResponse.text);
 
-         expect(newParsedResponse.length).toBe(len-1);
-         expect(delStatus).toBe(true);
+    expect(newParsedResponse.length).toBe(len - 1);
+    expect(delStatus).toBe(true);
   });
 });

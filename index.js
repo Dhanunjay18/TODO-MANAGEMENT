@@ -1,4 +1,4 @@
-const app = require('./app')
+const app = require("./app");
 app.listen(3000, () => {
-    console.log("Started Express at <3")
-})
+  console.log("Started Express at <3");
+});
