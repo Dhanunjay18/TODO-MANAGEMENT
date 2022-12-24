@@ -5,14 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./css/styles.css" rel="stylesheet">
-    <title>Document</title>
+    <title>My Todo Mangement Application</title>
 </head>
 <body>
     <%- include('header.ejs') %>
-    <table>
-        <% for(var i = 0; i<allTodos.length; i++) { %>
-        <tr><td><%= allTodos[i].title %></td></tr>
-        <% } %> 
-    </table>
+    <%- include('todos.ejs') %>
+    <%- include('foot.ejs') %>
 </body>
 </html>
