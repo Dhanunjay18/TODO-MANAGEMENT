@@ -2,10 +2,14 @@
 const express = require("express");
 const app = express();
 const { Todo } = require("./models");
+const csrf = require("csurf");
+var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const path = require("path");
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser("Here is the Key"));
+app.use(csrf({ cookie: true }));
 
 app.set("view engine", "ejs");
 
@@ -23,6 +27,7 @@ app.get("/", async function (request, response) {
       overdue,
       dueToday,
       dueLater,
+      csrfToken: request.csrfToken(),
     });
   } else {
     response.json({
