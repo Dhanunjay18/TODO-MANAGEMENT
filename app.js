@@ -97,10 +97,11 @@ app.delete("/todos/:id", async function (request, response) {
 
 app.put("/todos/:id", async function (request, response) {
   console.log("Putting a todos` completion status: ", request.params.id);
-  const todo = await Todo.findByPk(request.params.id);
   try {
-    const updatedTodo = await todo.setCompletionStatus(request.body.completed);
-    return response.json(updatedTodo);
+    const todo = await Todo.findByPk(request.params.id);
+    return response.json(
+      await todo.setCompletionStatus(request.body.completed)
+    );
   } catch (error) {
     return response.status(422).json(error);
   }
