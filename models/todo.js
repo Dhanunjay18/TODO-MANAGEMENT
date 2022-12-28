@@ -47,6 +47,14 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static async completedItems() {
+      return this.findAll({
+        where: {
+          completed: true,
+        },
+      });
+    }
+
     static async remove(id) {
       return this.destroy({
         where: {
@@ -57,6 +65,10 @@ module.exports = (sequelize, DataTypes) => {
 
     markAsCompleted() {
       return this.update({ completed: true });
+    }
+
+    setCompletionStatus(boolean_value) {
+      return this.update({ completed: boolean_value });
     }
   }
   Todo.init(
