@@ -13,18 +13,20 @@
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
             // function updateTodo(id) {
-            function updateTodo(id, boolean_value) {
+            function updateTodo(id, boolean_value) {   // Juz pass two parameters second one is boolean value
                 console.log("Here");
-                fetch(`/todos/${id}`, {
-                // fetch(`/todos/${id}`, {
+                fetch(`/todos/${id}`, {                // Remove markAsCompleted and just keeep id
+                // fetch(`/todos/${id}/markAsCompleted`, {
                 method: "put",
                 headers: { 
                     "Content-Type": "application/json" ,
                 },
-                body: JSON.stringify({
-                    "_csrf": token,
-                    completed: boolean_value,
-                })
+                body: JSON.stringify(
+                    {
+                        "_csrf": token,
+                        completed: boolean_value,  // As mentioned requirement we should pass boolean value in PUT method to check completed
+                    }
+                )
             })
             .then((res) => {
                 if(res.ok){

@@ -96,6 +96,10 @@ app.delete("/todos/:id", async function (request, response) {
 // });
 
 app.put("/todos/:id", async function (request, response) {
+  /*
+    Replace /todos/:id/markAsCompleted
+    with /todos/:id to accept a PUT request and use completed key in the PUT request body to update a todo item.
+  */
   console.log("Putting a todos` completion status: ", request.params.id);
   try {
     const todo = await Todo.findByPk(request.params.id);

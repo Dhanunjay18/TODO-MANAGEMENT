@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.lt]: new Date().toISOString().split("T")[0],
           },
+          completed: false,
         },
       });
     }
@@ -34,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.eq]: new Date().toISOString().split("T")[0],
           },
+          completed: false,
         },
       });
     }
@@ -43,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.gt]: new Date().toISOString().split("T")[0],
           },
+          completed: false,
         },
       });
     }
@@ -67,6 +70,11 @@ module.exports = (sequelize, DataTypes) => {
       return this.update({ completed: true });
     }
 
+    /* 
+      Mark a to-do as complete. Instead of markAsCompleted,
+      implement a setCompletionStatus method in the Todo model, 
+      which takes a boolean value and updates the todo item accordingly.
+    */
     setCompletionStatus(boolean_value) {
       return this.update({ completed: boolean_value });
     }
