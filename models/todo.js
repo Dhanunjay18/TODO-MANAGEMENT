@@ -66,10 +66,6 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    markAsCompleted() {
-      return this.update({ completed: true });
-    }
-
     /* 
       Mark a to-do as complete. Instead of markAsCompleted,
       implement a setCompletionStatus method in the Todo model, 
