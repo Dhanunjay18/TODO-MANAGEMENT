@@ -5,19 +5,22 @@ const { Todo, User } = require("./models");
 const csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const path = require("path");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
+const flash = require("connect-flash");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const path = require("path");
+app.set("views", path.join(__dirname, "views"));
 
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("Here is the Key"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+app.use(flash());
 // app.use(csrf("this_should_be_32_character_long"));
 
 // eslint-disable-next-line no-undef
@@ -34,7 +37,10 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
+});
 passport.use(
   new LocalStrategy(
     {
@@ -42,18 +48,17 @@ passport.use(
       passwordField: "password",
     },
     (username, password, done) => {
-      User.findOne({
-        where: {
-          email: username,
-        },
-      })
-        .then(async (user) => {
+      User.findOne({ where: { email: username } })
+        .then(async function (user) {
           const result = await bcrypt.compare(password, user.password);
-          if (result) return done(null, user);
-          else return done("Invalid password");
+          if (result) {
+            return done(null, user);
+          } else {
+            return done(null, false, { message: "Invalid password" });
+          }
         })
         .catch((error) => {
-          return { error };
+          return done(error);
         });
     }
   )
@@ -129,25 +134,6 @@ app.get("/todos/:id", async function (request, response) {
   }
 });
 
-app.post(
-  "/todos",
-  connectEnsureLogin.ensureLoggedIn(),
-  async function (request, response) {
-    try {
-      console.log(request.user);
-      const todo = await Todo.addTodo({
-        title: request.body.title,
-        dueDate: request.body.dueDate,
-        userId: request.user.id,
-      });
-      return response.redirect("/todos");
-    } catch (error) {
-      console.log(error);
-      return response.status(422).json(error);
-    }
-  }
-);
-
 app.delete(
   "/todos/:id",
   connectEnsureLogin.ensureLoggedIn(),
@@ -173,6 +159,19 @@ app.post("/users", async (request, response) => {
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
   try {
+    const firstNameSize = Object.keys(request.body.firstName).length;
+    const lastNameSize = Object.keys(request.body.lastName).length;
+    const emailSize = Object.keys(request.body.email).length;
+    const passwordSize = Object.keys(request.body.password).length;
+    if (
+      firstNameSize == 0 ||
+      lastNameSize === 0 ||
+      emailSize == 0 ||
+      passwordSize === 0
+    ) {
+      request.flash("error", "The fields must not be empty!");
+      return response.redirect("/signup");
+    }
     const user = await User.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
@@ -208,10 +207,44 @@ app.get("/signout", async (request, response, next) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
-  (request, response) => {
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  function (request, response) {
     console.log(request.user);
     response.redirect("/todos");
+  }
+);
+
+app.post(
+  "/todos",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    try {
+      const titleSize = Object.keys(request.body.title).length;
+      const dueDateSize = Object.keys(request.body.dueDate).length;
+      console.log(titleSize, dueDateSize);
+      if (titleSize === 0 || dueDateSize === 0) {
+        request.flash("error", "No blanks allowed");
+        return response.redirect("/todos");
+      }
+      if (titleSize <= 5) {
+        request.flash("error", "Please provide a todo with atleast 5 chars");
+        return response.redirect("/todos");
+      } else {
+        console.log(request.user);
+        const todo = await Todo.addTodo({
+          title: request.body.title,
+          dueDate: request.body.dueDate,
+          userId: request.user.id,
+        });
+      }
+      return response.redirect("/todos");
+    } catch (error) {
+      console.log(error);
+      return response.status(422).json(error);
+    }
   }
 );
 
