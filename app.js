@@ -172,6 +172,15 @@ app.post("/users", async (request, response) => {
       request.flash("error", "The fields must not be empty!");
       return response.redirect("/signup");
     }
+    console.log(
+      "Mail id : ",
+      User.findOne({ where: { email: request.body.email } }).then((chk) => {
+        if (chk != null) {
+          request.flash("error", "Email ALready exits");
+          response.redirect("/signup");
+        }
+      })
+    );
     const user = await User.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
