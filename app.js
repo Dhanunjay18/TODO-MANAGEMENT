@@ -58,7 +58,7 @@ passport.use(
           }
         })
         .catch((error) => {
-          return done(error);
+          return done(null, false, { message: "Invalid Username" });
         });
     }
   )
