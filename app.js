@@ -229,7 +229,7 @@ app.post(
         request.flash("error", "No blanks allowed");
         return response.redirect("/todos");
       }
-      if (titleSize <= 5) {
+      if (titleSize < 5) {
         request.flash("error", "Please provide a todo with atleast 5 chars");
         return response.redirect("/todos");
       } else {
